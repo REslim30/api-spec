@@ -7,7 +7,12 @@
 	"paths": {
 		"/examplepath": {
 			"get": {
-				"description": "Gets some stuff"
+				"description": "Gets some stuff",
+				"responses": {
+					"200": {
+						"description": "200 response"
+					}
+				}
 			}
 		}
 	}
