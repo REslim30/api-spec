@@ -6,7 +6,9 @@
 	},
 	"paths": {
 		"/examplepath": {
-
+			"get": {
+				"description": "Gets some stuff"
+			}
 		}
 	}
 }
