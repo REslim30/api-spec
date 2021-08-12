@@ -9,18 +9,23 @@ components:
       properties:
         id: 
           type: integer
+          example: 278
         name:
           type: string
+          example: "DoctorDoctor Pty Ltd"
         office:
           type: string
           nullable: true
+          example: "Richmond"
     Tranche:
       type: object
       properties:
         id:
           type: integer
+          example: 4889
         name:
           type: string
+          example: Cisco renewal due 28 June 2022
         type:
           $ref: '#/components/schemas/TrancheType'
     Task:
@@ -28,13 +33,17 @@ components:
       properties:
         id:
           type: integer
+          example: 10923874
         name:
           type: string
+          example: Medical Director Configuration
         type:
-          type: string
-          enum:
-            - job
-            - ticket
+          $ref: '#/components/schemas/TaskType'
+    TaskType:
+      type: string
+      enum:
+        - job
+        - ticket
     TrancheType:
       type: string
       enum:
@@ -46,8 +55,10 @@ components:
       properties:
         id:
           type: integer
+          example: 1293874
         name:
           type: string
+          example: Karin Hollands
         rateRoles:
           type: array
           items:
@@ -57,30 +68,99 @@ components:
       properties:
         id:
           type: integer
+          example: 29384709
         name:
           type: string
+          example: Head Office
     RateType:
       type: object
       properties:
         id:
           type: integer
+          example: 92138749
         name:
           type: string
+          example: Overtime
         multiplier:
           type: number
           format: float
-          description: "Rate Type multiplier to multiply the baseline rate. E.g. 1.75 on Saturdays"
+          description: "Rate Type multiplier to multiply the baseline rate."
+          example: 1.75
     RateRole:
       type: object
       properties:
         id:
           type: integer
+          example: 209348712
         name:
           type: string
+          example: "Developer"
         rate:
           type: number
           format: float
-          description: "Baseline rate in $/hr. E.g. $50.75/hr"
+          description: "Baseline rate in $/hr."
+          example: 50.75
+    Date:
+      type: string
+      format: string
+      description: "A date in ISO8601 format."
+      example: '2021-08-12'
+    WorksheetUpsertBody:
+      type: object
+      properties:
+        clientId:
+          type: integer
+        trancheId:
+          type: integer
+        trancheType:
+          $ref: '#/components/schemas/TrancheType'
+        taskId:
+          type: integer
+        taskType:
+          $ref: '#/components/schemas/TaskType'
+        personnelId:
+          type: integer
+        workLocationId:
+          type: integer
+        rateRoleId:
+          type: integer
+        rateTypeId:
+          type: integer
+        description:
+          type: string
+          example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+        timeSpent:
+          $ref: '#/components/schemas/HourAndMinuteDuration'
+        timeCharged:
+          $ref: '#/components/schemas/HourAndMinuteDuration'
+    HourAndMinuteDuration:
+      type: string
+      format: duration
+      description: "A duration in ISO8601 format containing only hours and minutes."
+      example: "P4H36M"
+
+  parameters:
+    PaginationLimit:
+      name: "limit"
+      in: "query"
+      description: "Pagination parameter. Number of rows to receive in response. E.g. ?limit=20 means respond with 20 objects."
+      schema:
+        type: integer
+        example: 20
+    PaginationOffset:
+      name: "offset"
+      in: "query"
+      description: "Pagination parameter. Which row to start at when retrieving. E.g. offset=100 retrieves starting from the 100th object (first object starts at 1)"
+      schema:
+        type: integer
+        example: 50
+    SearchQuery:
+      name: "q"
+      in: "query"
+      description: "Search parameter. Search on relevant fields. Substring search. E.g. unno Para would return Munno Para Foodland"
+      schema:
+        type: string
+        example: Munno Para
 
 paths:
   /clients:
@@ -90,17 +170,13 @@ paths:
       description: "QUESTIONS: Pagination or searching client side?"
       parameters:
         - 
-          name: "limit"
-          in: "query"
-          description: "Pagination parameter. How many rows to return. E.g. limit=20 retrieves 20 objects."
+          $ref: "#/components/parameters/PaginationLimit"
         - 
-          name: "offset"
-          in: "query"
-          description: "Pagination parameter. Which row to start at when retrieving. E.g. offset=100 retrieves starting from the 100th object (first object starts at 1)"
+          $ref: '#/components/parameters/PaginationOffset'
         - 
-          name: "q"
-          in: "query"
-          description: "Search parameter. Search on relevant fields. In this case, client name and office."
+          $ref: '#/components/parameters/SearchQuery'
+      tags:
+        - basic
       responses:
         '200':
           description: 200 response
@@ -163,6 +239,8 @@ paths:
   '/clients/{clientId}': 
     get:
       summary: Retrieve a client object
+      tags:
+        - basic
       responses:
         '200':
           description: 200 response
@@ -172,7 +250,16 @@ paths:
                 $ref: '#/components/schemas/Client'
   '/clients/{clientId}/tranches':
     get:
+      parameters:
+        - 
+          $ref: "#/components/parameters/PaginationLimit"
+        - 
+          $ref: '#/components/parameters/PaginationOffset'
+        - 
+          $ref: '#/components/parameters/SearchQuery'
       summary: Retrieve all tranches (projects, opportunites and contracts) associated with a client
+      tags:
+        - basic
       description: "QUESTION: Pagination or client-side search?<br>QUESTION: Combined resource vs split resource? E.g. /projects, /opportunities, /contracts"
       responses:
         '200':
@@ -186,7 +273,15 @@ paths:
   '/tranches/{trancheType}/{tranceId}/tasks':
     get:
       summary: Retrieve tasks associated with tranche (projects, opportunites and contracts)
+      tags:
+        - basic
       parameters:
+        - 
+          $ref: "#/components/parameters/PaginationLimit"
+        - 
+          $ref: '#/components/parameters/PaginationOffset'
+        - 
+          $ref: '#/components/parameters/SearchQuery'
         - 
           name: "trancheType"
           required: true
@@ -205,6 +300,8 @@ paths:
   /personnel:
     get:
       summary: Retrieve all personnel
+      tags:
+        - basic
       responses:
         '200':
           description: 200 response
@@ -217,6 +314,8 @@ paths:
   /work-locations:
     get:
       summary: Retrieve all work locations
+      tags:
+        - basic
       responses:
         '200':
           description: 200 response
@@ -229,6 +328,8 @@ paths:
   /rate-types:
     get:
       summary: Retrieve all rate types
+      tags:
+        - basic
       responses:
         '200':
           description: 200 response
@@ -238,3 +339,66 @@ paths:
                 type: "array"
                 items:
                   $ref: '#/components/schemas/RateType'
+  '/personnel/{personnelId}/worksheets':
+    get:
+      summary: Retrieve all worksheets for a personnel at a particular date
+      tags:
+        - basic
+      parameters:
+        -
+          name: "date"
+          in: "query"
+          required: true
+          description: "Date in ISO8601 format."
+          schema:
+            $ref: '#/components/schemas/Date'
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/WorksheetUpsertBody'
+  '/worksheets':
+    post:
+      summary: Create a worksheet
+      tags:
+        - basic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorksheetUpsertBody'
+      responses:
+        '201':
+          description: 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorksheetUpsertBody'
+  '/worksheets/{worksheetId}':
+    put:
+      summary: Update a worksheet
+      tags:
+        - basic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorksheetUpsertBody'
+      responses:
+        '200':
+          description: 200 success  
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorksheetUpsertBody'
+    delete:
+      summary: Delete a worksheet
+      tags:
+        - basic
+      responses:
+        '204':
+          description: 204 success with no content
