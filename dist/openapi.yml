@@ -14,6 +14,73 @@ components:
         office:
           type: string
           nullable: true
+    Tranche:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/TrancheType'
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - job
+            - ticket
+    TrancheType:
+      type: string
+      enum:
+        - project
+        - "opportunity"
+        - contract
+    Personnel:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        rateRoles:
+          type: array
+          items:
+            $ref: "#/components/schemas/RateRole"
+    WorkLocation:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    RateType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        multiplier:
+          type: number
+          format: float
+          description: "Rate Type multiplier to multiply the baseline rate. E.g. 1.75 on Saturdays"
+    RateRole:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        rate:
+          type: number
+          format: float
+          description: "Baseline rate in $/hr. E.g. $50.75/hr"
 
 paths:
   /clients:
@@ -103,3 +170,71 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Client'
+  '/clients/{clientId}/tranches':
+    get:
+      summary: Retrieve all tranches (projects, opportunites and contracts) associated with a client
+      description: "QUESTION: Pagination or client-side search?<br>QUESTION: Combined resource vs split resource? E.g. /projects, /opportunities, /contracts"
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Tranche'
+  '/tranches/{trancheType}/{tranceId}/tasks':
+    get:
+      summary: Retrieve tasks associated with tranche (projects, opportunites and contracts)
+      parameters:
+        - 
+          name: "trancheType"
+          required: true
+          in: path
+          schema:
+            $ref: '#/components/schemas/TrancheType'
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Task'
+  /personnel:
+    get:
+      summary: Retrieve all personnel
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Personnel'
+  /work-locations:
+    get:
+      summary: Retrieve all work locations
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/WorkLocation'
+  /rate-types:
+    get:
+      summary: Retrieve all rate types
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/RateType'
