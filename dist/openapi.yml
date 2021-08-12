@@ -44,12 +44,28 @@ components:
       enum:
         - job
         - ticket
+    NullableTaskType:
+      type: string
+      enum:
+        - job
+        - ticket
+      nullable: true
+      example: null
+
     TrancheType:
       type: string
       enum:
         - project
         - "opportunity"
         - contract
+    NullableTrancheType:
+      type: string
+      enum:
+        - project
+        - "opportunity"
+        - contract
+      nullable: true
+      example: null
     Personnel:
       type: object
       properties:
@@ -133,11 +149,91 @@ components:
           $ref: '#/components/schemas/HourAndMinuteDuration'
         timeCharged:
           $ref: '#/components/schemas/HourAndMinuteDuration'
+      required:
+        - "clientId"
+        - trancheId
+        - trancheType
+        - taskId
+        - taskType
+        - personnelId
+        - workLocationId
+        - rateRoleId
+        - rateTypeId
+        - description
+        - timeSpent
+        - timeCharged
+    TemporaryWorksheet:
+      type: object
+      properties:
+        timeSpent:
+          $ref: '#/components/schemas/HourAndMinuteDuration'
+        name:
+          type: string
+          example: Job for Munno Para
+          nullable: true
+        notes:
+          type: string
+          format: html
+          example: <br>Lorem ipsum dolor sit</br> amet, <h1>consectetur adipiscing</h1> elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+          nullable: true
+        clientId:
+          type: integer
+          nullable: true
+          example: null
+        trancheId:
+          type: integer
+          nullable: true
+          example: null
+        trancheType:
+          $ref: '#/components/schemas/NullableTrancheType'
+          nullable: true
+          example: null
+        taskId:
+          type: integer
+          nullable: true
+          example: null
+        taskType:
+          $ref: '#/components/schemas/NullableTaskType'
+          nullable: true
+          example: null
+        personnelId:
+          type: integer
+          nullable: true
+          example: null
+        workLocationId:
+          type: integer
+          nullable: true
+          example: null
+        rateRoleId:
+          type: integer
+          nullable: true
+          example: null
+        rateTypeId:
+          type: integer
+          nullable: true
+          example: null
+        description:
+          type: string
+          nullable: true
+          example: null
+        timeCharged:
+          $ref: '#/components/schemas/NullableHourAndMinuteDuration'
+          nullable: true
+          example: null
+      required:
+        - "timeSpent"
+
     HourAndMinuteDuration:
       type: string
       format: duration
       description: "A duration in ISO8601 format containing only hours and minutes."
       example: "P4H36M"
+    NullableHourAndMinuteDuration:
+      type: string
+      format: duration
+      description: "A duration in ISO8601 format containing only hours and minutes."
+      nullable: true
+      example: null
 
   parameters:
     PaginationLimit:
@@ -161,6 +257,13 @@ components:
       schema:
         type: string
         example: Munno Para
+    Date:
+      name: 'date'
+      in: "query"
+      required: true
+      description: "Query parameter. Date in ISO8601 format."
+      schema:
+        $ref: '#/components/schemas/Date'
 
 paths:
   /clients:
@@ -345,13 +448,7 @@ paths:
       tags:
         - basic
       parameters:
-        -
-          name: "date"
-          in: "query"
-          required: true
-          description: "Date in ISO8601 format."
-          schema:
-            $ref: '#/components/schemas/Date'
+        - $ref: '#/components/parameters/Date' 
       responses:
         '200':
           description: 200 response
@@ -362,6 +459,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/WorksheetUpsertBody'
   '/worksheets':
+    parameters:
+      - $ref: '#/components/parameters/Date'
     post:
       summary: Create a worksheet
       tags:
@@ -402,3 +501,73 @@ paths:
       responses:
         '204':
           description: 204 success with no content
+  '/temporary-worksheet':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/Date'
+      summary: Create a temporary worksheet
+      tags:
+        - temporary worksheets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemporaryWorksheet'
+      responses:
+        '201':
+          description: 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemporaryWorksheet'
+    get:
+      parameters:
+        - $ref: '#/components/parameters/Date'
+      summary: Retrieve all temporary worksheets
+      tags:
+        - temporary worksheets
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemporaryWorksheet'
+  '/temporary-worksheet/{temporaryWorksheetId}':
+    get:
+      summary: Retrieve a single temporary worksheet
+      tags:
+        - temporary worksheets
+      responses:
+        '200':
+          description: 200 success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemporaryWorksheet'
+
+    put:
+      summary: Update a temporary worksheet
+      tags:
+        - temporary worksheets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemporaryWorksheet'
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemporaryWorksheet'
+    delete:
+      summary: Delete a temporary worksheet
+      tags:
+        - temporary worksheets
+      responses:
+        '204':
+          description: 204 No Content
