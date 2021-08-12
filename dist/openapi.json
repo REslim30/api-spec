@@ -5,42 +5,82 @@
 		"version": "1.0.0"
 	},
 	"paths": {
-		"/examplepath": {
+		"/clients": {
 			"get": {
-				"description": "Gets some stuff",
+				"summary": "Paginated retrieval of clients. In terms of the schema this is the dot product of Organizations and Office.",
+        "description": "QUESTIONS: Pagination or searching client side?",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Pagination parameter. How many rows to return. E.g. limit=20 retrieves 20 objects."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination parameter. Which row to start at when retrieving. E.g. offset=100 retrieves starting from the 100th object (first object starts at 1)"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search parameter. Search on relevant fields. In this case, client name and office."
+          }
+        ],
 				"responses": {
 					"200": {
             "description": "200 response",
             "content": {
               "application/json": {
                 "examples": {
-                  "foo": {
-                    "value": {
-                      "versions": [
+                  "Get all clients": {
+                    "value": 
+                      [
                         {
-                          "status": "CURRENT",
-                          "updated": "2011-01-21T11:33:21Z",
-                          "id": "v2.0",
-                          "links": [
-                            {
-                              "href": "http://127.0.0.1:8774/v2/",
-                              "rel": "self"
-                            }
-                          ]
+                          "id": 1,
+                          "name": "Comunet",
+                          "office": "Adelaide Office"
                         },
                         {
-                          "status": "EXPERIMENTAL",
-                          "updated": "2013-07-23T11:33:21Z",
-                          "id": "v3.0",
-                          "links": [
-                            {
-                              "href": "http://127.0.0.1:8774/v3/",
-                              "rel": "self"
-                            }
-                          ]
+                          "id": 2,
+                          "name": "National Medical Services Group Pty Ltd",
+                          "office": "Melbourne"
+                        },
+                        {
+                          "id": 3,
+                          "name": "Alexander & Symonds Pty Ltd",
+                          "office": "Head Office"
+                        },
+                        {
+                          "id": 4,
+                          "name": "Seeley International Pty Ltd",
+                          "office": "Lonsdale"
+                        },
+                        {
+                          "id": 5,
+                          "name": "Thomson Geer",
+                          "office": null
+                        },
+                        {
+                          "id": 6,
+                          "name": "Royal Flying Doctor - SE Section",
+                          "office": "RFDS Broken Hill"
+                        },
+                        {
+                          "id": 7,
+                          "name": "ACH Group",
+                          "office": "Head Office"
+                        },
+                        {
+                          "id": 8,
+                          "name": "Munno Para Foodland",
+                          "office": null
+                        },
+                        {
+                          "id": 9,
+                          "name": "DoctorDoctor Pty Ltd",
+                          "office": "Richmond"
                         }
                       ]
-                    }
                   }
                 }
               }
