@@ -2,6 +2,19 @@ openapi: "3.0.0"
 info:
   title: Simple API overview
   version: 1.0.0
+components:
+  schemas:
+    Client:
+      type: 'object'
+      properties:
+        id: 
+          type: integer
+        name:
+          type: string
+        office:
+          type: string
+          nullable: true
+
 paths:
   /clients:
     get:
@@ -23,8 +36,13 @@ paths:
           description: "Search parameter. Search on relevant fields. In this case, client name and office."
       responses:
         '200':
+          description: 200 response
           content:
             application/json: 
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Client'
               examples: 
                 'Get all clients': 
                   value:
@@ -75,3 +93,13 @@ paths:
                         "office": "Richmond"
                       }
                     ]
+  '/clients/{clientId}': 
+    get:
+      summary: Retrieve a client object
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
