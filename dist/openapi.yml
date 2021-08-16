@@ -234,29 +234,23 @@ components:
       description: "A duration in ISO8601 format containing only hours and minutes."
       nullable: true
       example: null
+    Timer:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1039247
+        totalDuration:
+          $ref: '#/components/schemas/HourAndMinuteDuration'
+        isRunning:
+          type: boolean
+          example: true
+      required:
+        - id
+        - "totalDuration"
+        - isRunning
 
   parameters:
-    PaginationLimit:
-      name: "limit"
-      in: "query"
-      description: "Pagination parameter. Number of rows to receive in response. E.g. ?limit=20 means respond with 20 objects."
-      schema:
-        type: integer
-        example: 20
-    PaginationOffset:
-      name: "offset"
-      in: "query"
-      description: "Pagination parameter. Which row to start at when retrieving. E.g. offset=100 retrieves starting from the 100th object (first object starts at 1)"
-      schema:
-        type: integer
-        example: 50
-    SearchQuery:
-      name: "q"
-      in: "query"
-      description: "Search parameter. Search on relevant fields. Substring search. E.g. unno Para would return Munno Para Foodland"
-      schema:
-        type: string
-        example: Munno Para
     Date:
       name: 'date'
       in: "query"
@@ -269,15 +263,7 @@ paths:
   /clients:
     get:
       operationId: listVersionsv2
-      summary: "Paginated retrieval of clients. In terms of the schema this is the dot product of Organizations and Office."
-      description: "QUESTIONS: Pagination or searching client side?"
-      parameters:
-        - 
-          $ref: "#/components/parameters/PaginationLimit"
-        - 
-          $ref: '#/components/parameters/PaginationOffset'
-        - 
-          $ref: '#/components/parameters/SearchQuery'
+      summary: "Retrieval of clients."
       tags:
         - basic
       responses:
@@ -353,13 +339,6 @@ paths:
                 $ref: '#/components/schemas/Client'
   '/clients/{clientId}/tranches':
     get:
-      parameters:
-        - 
-          $ref: "#/components/parameters/PaginationLimit"
-        - 
-          $ref: '#/components/parameters/PaginationOffset'
-        - 
-          $ref: '#/components/parameters/SearchQuery'
       summary: Retrieve all tranches (projects, opportunites and contracts) associated with a client
       tags:
         - basic
@@ -379,12 +358,6 @@ paths:
       tags:
         - basic
       parameters:
-        - 
-          $ref: "#/components/parameters/PaginationLimit"
-        - 
-          $ref: '#/components/parameters/PaginationOffset'
-        - 
-          $ref: '#/components/parameters/SearchQuery'
         - 
           name: "trancheType"
           required: true
@@ -571,3 +544,79 @@ paths:
       responses:
         '204':
           description: 204 No Content
+  '/timer':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/Date'
+      summary: "create a timer"
+      tags:
+        - timer
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timer'
+    get:
+      parameters:
+        - $ref: '#/components/parameters/Date'
+      summary: "retrieve all users timers"
+      tags:
+        - timer
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timer'
+  '/timer/{timerId}':
+    get:
+      summary: "retreive a timer"
+      tags:
+        - timer
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timer'
+    delete:
+      summary: "delete a timer"
+      tags:
+        - timer
+      responses:
+        '200':
+          description: 200 Success
+  '/timer/{timerId}/start':
+    put:
+      summary: 'start a timer'
+      tags:
+        - timer
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timer'
+  '/timer/{timerId}/stop':
+    put:
+      summary: 'start a timer'
+      tags:
+        - timer
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timer'
