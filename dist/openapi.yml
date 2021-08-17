@@ -17,28 +17,96 @@ components:
           type: string
           nullable: true
           example: "Richmond"
-    Tranche:
+    ProjectSummary:
       type: object
       properties:
         id:
-          type: integer
-          example: 4889
+          $ref: "#/components/schemas/Id"
         name:
           type: string
           example: Cisco renewal due 28 June 2022
-        type:
-          $ref: '#/components/schemas/TrancheType'
-    Task:
+    OpportunitiesSummary:
       type: object
       properties:
         id:
-          type: integer
-          example: 10923874
+          $ref: "#/components/schemas/Id"
+        name:
+          type: string
+          example: Cisco renewal due 28 June 2022
+    ContractSummary:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          example: Cisco renewal due 28 June 2022
+    Project:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Id"
+        name:
+          type: string
+          example: Cisco renewal due 28 June 2022
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+    Opportunity:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Id"
+        name:
+          type: string
+          example: Cisco renewal due 28 June 2022
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+    Contract:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Id"
+        name:
+          type: string
+          example: Cisco renewal due 28 June 2022
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+    Job:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
         name:
           type: string
           example: Medical Director Configuration
-        type:
-          $ref: '#/components/schemas/TaskType'
+        
+    Ticket:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          example: Medical Director Configuration
+        
     TaskType:
       type: string
       enum:
@@ -249,6 +317,9 @@ components:
         - id
         - "totalDuration"
         - isRunning
+    Id:
+      type: integer
+      example: 1293847
 
   parameters:
     Date:
@@ -258,6 +329,20 @@ components:
       description: "Query parameter. Date in ISO8601 format."
       schema:
         $ref: '#/components/schemas/Date'
+    ClientFilter:
+      name: 'clientId'
+      in: "query"
+      required: true
+      description: "Query parameter to filter by client."
+      schema: 
+        $ref: "#/components/schemas/Id"
+    PersonnelFilter:
+      name: 'personnelId'
+      in: "query"
+      required: true
+      description: "Query parameter to filter by personnel."
+      schema:
+        $ref: "#/components/schemas/Id"
 
 paths:
   /clients:
@@ -337,33 +422,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Client'
-  '/clients/{clientId}/tranches':
+  '/projects':
     get:
-      summary: Retrieve all tranches (projects, opportunites and contracts) associated with a client
-      tags:
-        - basic
-      description: "QUESTION: Pagination or client-side search?<br>QUESTION: Combined resource vs split resource? E.g. /projects, /opportunities, /contracts"
-      responses:
-        '200':
-          description: 200 response
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: '#/components/schemas/Tranche'
-  '/tranches/{trancheType}/{tranceId}/tasks':
-    get:
-      summary: Retrieve tasks associated with tranche (projects, opportunites and contracts)
+      summary: "filtered route to get projects. (Retrieval via clientId is only required)"
       tags:
         - basic
       parameters:
         - 
-          name: "trancheType"
-          required: true
-          in: path
-          schema:
-            $ref: '#/components/schemas/TrancheType'
+          $ref: "#/components/parameters/ClientFilter"
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSummary'
+  '/projects/{projectId}':
+    get:
+      summary: Retrieve aggregated projects object
+      tags:
+        - basic
       responses:
         '200':
           description: 200 response
@@ -372,7 +450,71 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: '#/components/schemas/Task'
+                  $ref: '#/components/schemas/Project'
+  
+  '/opportunties':
+    get:
+      summary: "filtered route to get opportunities. (Retrieval via clientId is only required)"
+      tags:
+        - basic
+      parameters:
+        - 
+          $ref: "#/components/parameters/ClientFilter"
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunitiesSummary'
+
+  '/opportunity/{opportunityId}':
+    get:
+      summary: Retrieve aggregated projects object
+      tags:
+        - basic
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Opportunity'
+      
+  '/contract':
+    get:
+      summary: "filtered route to get contracts. (Retrieval via clientId is only required)"
+      tags:
+        - basic
+      parameters:
+        - 
+          $ref: "#/components/parameters/ClientFilter"
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractSummary'
+
+  '/contracts/{contractId}':
+    get:
+      summary: Retrieve aggregated contract object
+      tags:
+        - basic
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Contract'
+  
+
   /personnel:
     get:
       summary: Retrieve all personnel
@@ -415,22 +557,6 @@ paths:
                 type: "array"
                 items:
                   $ref: '#/components/schemas/RateType'
-  '/personnel/{personnelId}/worksheets':
-    get:
-      summary: Retrieve all worksheets for a personnel at a particular date
-      tags:
-        - basic
-      parameters:
-        - $ref: '#/components/parameters/Date' 
-      responses:
-        '200':
-          description: 200 response
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: '#/components/schemas/WorksheetUpsertBody'
   '/worksheets':
     parameters:
       - $ref: '#/components/parameters/Date'
@@ -450,6 +576,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorksheetUpsertBody'
+    get:
+      summary: Retrieve all worksheets for a personnel at a particular date for a particular personnel
+      tags:
+        - basic
+      parameters:
+        - $ref: '#/components/parameters/Date' 
+        - $ref: '#/components/parameters/PersonnelFilter'
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/WorksheetUpsertBody'
   '/worksheets/{worksheetId}':
     put:
       summary: Update a worksheet
