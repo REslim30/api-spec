@@ -235,6 +235,10 @@ components:
       properties:
         timeSpent:
           $ref: '#/components/schemas/HourAndMinuteDuration'
+        timeSpentTimerId:
+          type: integer
+          example: null
+          nullable: true
         name:
           type: string
           example: Job for Munno Para
