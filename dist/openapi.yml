@@ -755,7 +755,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Timer'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timer'
     delete:
       summary: "delete a timer"
       tags:
@@ -763,6 +765,19 @@ paths:
       responses:
         '200':
           description: 200 Success
+    put:
+      summary: update a timers time
+      tags:
+        - timer
+      responses:
+        '200':
+          description: 200 Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timer'
   '/timer/{timerId}/start':
     put:
       summary: 'start a timer'
