@@ -514,6 +514,35 @@ paths:
                 items:
                   $ref: '#/components/schemas/Contract'
   
+  '/jobs':
+    get:
+      summary: Get list of jobs
+      tags:
+        - basic
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+
+  /tickets:
+    get:
+      summary: Get a list of all tickets
+      tags:
+        - basic
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
 
   /personnel:
     get:
